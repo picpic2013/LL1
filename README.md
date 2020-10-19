@@ -48,3 +48,35 @@ std::string get(const std::string& S, const std::string& a);
 void add(const std::string& S, const std::string& a, const std::string& exp);
 ~~~
 
+#### 示例程序
+
+~~~c++
+#include <iostream>
+#include "PredictionMatrix.h"
+using namespace std;
+
+int main() {
+    // 定义一个预测矩阵
+    PredictionMatrix m;
+    
+    // 查看预测矩阵中，这个行列索引是否合法
+    cout << m.has("aa", "bb") << endl;
+    // 输出结果: 0
+
+    // 通过行列索引获得预测矩阵中的值
+    cout << m.get("aa", "bb") << endl;
+    // 输出结果: 
+
+    // 增加一条语法展开式的 Select 集
+    m.add("aa", "bb", "CCC");
+
+    // 查看预测矩阵中，这个行列索引是否合法
+    cout << m.has("aa", "bb") << endl;
+    // 输出结果: 1
+
+    // 通过行列索引获得预测矩阵中的值
+    cout << m.get("aa", "bb") << endl;
+    // 输出结果: CCC
+}
+~~~
+
