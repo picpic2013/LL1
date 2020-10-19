@@ -139,7 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LL1.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="PredictionMatrix.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PredictionMatrix.h" />
+    <ClInclude Include="Status.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
