@@ -80,3 +80,112 @@ int main() {
 }
 ~~~
 
+### Grammar
+
+#### 实现思路
+
+pair 向量，并实现迭代器等
+
+~~~c++
+std::vector<std::pair<std::string, std::string> > data;
+~~~
+
+#### 功能函数
+
+~~~c++
+// 返回起始迭代器
+Grammar::iterator begin();
+
+// 返回结束迭代器
+Grammar::iterator end();
+
+// 返回语法的数量
+int size() const;
+
+// 插入一条新的语法
+void insert(const std::string& S, const std::string& a);
+~~~
+
+#### 迭代器支持
+
+~~~c++
+// 获取语法左端值
+std::string& getKey() const;
+
+// 获取语法右端值
+std::string& getValue() const;
+
+// 迭代器赋值符号重载
+iterator& operator=(const iterator& iter);
+
+// 迭代器判断全等符号重载
+bool operator==(const iterator& iter);
+
+// 迭代器判断不等符号重载
+bool operator!=(const iterator& iter);
+
+// 迭代器后缀自增符号重载
+iterator operator++(int n);
+
+// 迭代器前缀自增符号重载
+iterator& operator++();
+
+// 迭代器后缀自减符号重载
+iterator operator--(int n);
+
+// 迭代器前缀自减符号重载
+iterator& operator--();
+
+// 迭代器加法符号重载
+iterator operator+(int n);
+
+// 迭代器减法符号重载
+iterator operator-(int n);
+
+// 迭代器加等于符号重载
+iterator& operator+=(int n);
+
+// 迭代器减等于符号重载
+iterator& operator-=(int n);
+
+// 迭代器解引用符号重载
+std::pair<std::string, std::string>& operator*();
+~~~
+
+#### 示例程序
+
+~~~c++
+#include <iostream>
+#include "Grammar.h"
+using namespace std;
+
+int main() {
+    // 定义语法数据结构
+    Grammar a;
+	
+    // 插入一些值
+    a.insert("S", "aBa");
+    a.insert("S", "cA");
+    a.insert("A", "bb");
+    a.insert("B", "CCD");
+    a.insert("C", "bb");
+    a.insert("D", "bb");
+	
+    // 遍历操作
+    for (Grammar::iterator it = a.begin(); it != a.end(); it++) {
+        cout << it.getKey() << "\t" << it.getValue() << endl;
+    }
+    cout << endl;
+	
+    // 迭代器取值测试
+    cout << (a.begin() + 2).getKey() << "\t" << (a.begin() + 2).getValue() << endl;
+    // 输出结果: A       bb
+    
+    // 迭代器取值测试
+    cout << (a.end() - 2).getKey() << "\t" << (a.end() - 2).getValue() << endl;
+	// 输出结果: C       bb
+    
+    return 0;
+}
+~~~
+

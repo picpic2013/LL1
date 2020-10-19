@@ -21,12 +21,18 @@
     <ClInclude Include="Status.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Grammar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="PredictionMatrix.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Grammar.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

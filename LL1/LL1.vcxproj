@@ -139,10 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Grammar.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PredictionMatrix.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Grammar.h" />
     <ClInclude Include="PredictionMatrix.h" />
     <ClInclude Include="Status.h" />
   </ItemGroup>

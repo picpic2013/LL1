@@ -1,23 +1,24 @@
 ﻿#include <iostream>
-#include "PredictionMatrix.h"
+#include "Grammar.h"
 using namespace std;
 
 int main() {
-    // define a prediction matrix
-    PredictionMatrix m;
-    
-    // print whether there is aa -> something = { bb, ... }
-    cout << m.has("aa", "bb") << endl;
+    Grammar a;
 
-    // get SOMETHING from ( aa -> something = { bb, ... } )
-    cout << m.get("aa", "bb") << endl;
+    a.insert("S", "aBa");
+    a.insert("S", "cA");
+    a.insert("A", "bb");
+    a.insert("B", "CCD");
+    a.insert("C", "bb");
+    a.insert("D", "bb");
 
-    // add grammar derivation ( aa -> CCC = { bb, ... } )
-    m.add("aa", "bb", "CCC");
+    for (Grammar::iterator it = a.begin(); it != a.end(); it++) {
+        cout << it.getKey() << "\t" << it.getValue() << endl;
+    }
+    cout << endl;
 
-    // print whether there is aa -> something = { bb, ... }
-    cout << m.has("aa", "bb") << endl;
+    cout << (a.begin() + 2).getKey() << "\t" << (a.begin() + 2).getValue() << endl;
+    cout << (a.end() - 2).getKey() << "\t" << (a.end() - 2).getValue() << endl;
 
-    // get SOMETHING from ( aa -> something = { bb, ... } )
-    cout << m.get("aa", "bb") << endl;
+    return 0;
 }
