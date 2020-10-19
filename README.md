@@ -84,10 +84,10 @@ int main() {
 
 #### 实现思路
 
-pair 向量，并实现迭代器等
+pair 集合，并实现迭代器
 
 ~~~c++
-std::vector<std::pair<std::string, std::string> > data;
+std::set<std::pair<std::string, std::string> > data
 ~~~
 
 #### 功能函数
@@ -100,10 +100,19 @@ Grammar::iterator begin();
 Grammar::iterator end();
 
 // 返回语法的数量
-int size() const;
+size_t size() const;
 
 // 插入一条新的语法
 void insert(const std::string& S, const std::string& a);
+
+// 删除一条语法
+void erase(const std::string& S, const std::string& a);
+
+// 自动将 "aa|bb" 分割成两个语法，返回一个新的，本身不动
+Grammar autoSplitOr();
+
+// 自动将 "aa|bb" 分割成两个语法，原地操作
+void autoSplitOrInPlace();
 ~~~
 
 #### 迭代器支持
@@ -135,21 +144,6 @@ iterator operator--(int n);
 
 // 迭代器前缀自减符号重载
 iterator& operator--();
-
-// 迭代器加法符号重载
-iterator operator+(int n);
-
-// 迭代器减法符号重载
-iterator operator-(int n);
-
-// 迭代器加等于符号重载
-iterator& operator+=(int n);
-
-// 迭代器减等于符号重载
-iterator& operator-=(int n);
-
-// 迭代器解引用符号重载
-std::pair<std::string, std::string>& operator*();
 ~~~
 
 #### 示例程序
@@ -164,8 +158,8 @@ int main() {
     Grammar a;
 	
     // 插入一些值
-    a.insert("S", "aBa");
-    a.insert("S", "cA");
+    a.insert("S", "aBa|cc");
+    a.insert("S", "cA|aaa|bbb|ccc|");
     a.insert("A", "bb");
     a.insert("B", "CCD");
     a.insert("C", "bb");
@@ -176,14 +170,54 @@ int main() {
         cout << it.getKey() << "\t" << it.getValue() << endl;
     }
     cout << endl;
-	
-    // 迭代器取值测试
-    cout << (a.begin() + 2).getKey() << "\t" << (a.begin() + 2).getValue() << endl;
-    // 输出结果: A       bb
+    // 输出结果: 
+    // A       bb
+    // B       CCD
+    // C       bb
+    // D       bb
+    // S       aBa|cc
+    // S       cA|aaa|bbb|ccc|
     
     // 迭代器取值测试
-    cout << (a.end() - 2).getKey() << "\t" << (a.end() - 2).getValue() << endl;
-	// 输出结果: C       bb
+    cout << (--a.end()).getKey() << "\t" << (--a.end()).getValue() << endl << endl;
+    // 输出结果: S       cA|aaa|bbb|ccc|
+    
+    // 自动分割 | 操作测试
+    Grammar b = a.autoSplitOr();
+	
+    // 遍历输出
+    for (Grammar::iterator it = b.begin(); it != b.end(); it++) {
+        cout << it.getKey() << "\t" << it.getValue() << endl;
+    }
+    cout << endl;
+    // 输出结果: 
+    // A       bb
+    // B       CCD
+    // C       bb
+    // D       bb
+    // S
+    // S       aBa
+    // S       aaa
+    // S       bbb
+    // S       cA
+    // S       cc
+    // S       ccc
+
+    // 删除测试
+    a.erase("S", "cA");
+
+    // 遍历输出
+    for (Grammar::iterator it = a.begin(); it != a.end(); it++) {
+        cout << it.getKey() << "\t" << it.getValue() << endl;
+    }
+    cout << endl;
+    // 输出结果: 
+    // A       bb
+    // B       CCD
+    // C       bb
+    // D       bb
+    // S       aBa|cc
+    // S       cA|aaa|bbb|ccc|
     
     return 0;
 }
