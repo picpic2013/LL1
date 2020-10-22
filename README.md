@@ -108,6 +108,9 @@ void insert(const std::string& S, const std::string& a);
 // 删除一条语法
 void erase(const std::string& S, const std::string& a);
 
+// 寻找语法，返回迭代器，用于后续求三个集合
+iterator find(const std::string& S, const std::string& a);
+
 // 自动将 "aa|bb" 分割成两个语法，返回一个新的，本身不动
 Grammar autoSplitOr();
 

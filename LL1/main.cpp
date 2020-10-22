@@ -5,31 +5,16 @@ using namespace std;
 int main() {
     Grammar a;
 
-    a.insert("S", "aBa|cc");
-    a.insert("S", "cA|aaa|bbb|ccc|");
-    a.insert("A", "bb");
-    a.insert("B", "CCD");
-    a.insert("C", "bb");
-    a.insert("D", "bb");
+    a.insert("S", "aBa|cc", false);
+    a.insert("S", "cA|aaa|bbb|ccc|", false);
+    a.insert("A", "bb", false);
+    a.insert("B", "CCD", false);
+    a.insert("C", "bb", false);
+    a.insert("D", "bb", false);
 
-    for (Grammar::iterator it = a.begin(); it != a.end(); it++) {
-        cout << it.getKey() << "\t" << it.getValue() << endl;
-    }
-    cout << endl;
-
-    cout << (--a.end()).getKey() << "\t" << (--a.end()).getValue() << endl << endl;
-
-    Grammar b = a.autoSplitOr();
-
-    for (Grammar::iterator it = b.begin(); it != b.end(); it++) {
-        cout << it.getKey() << "\t" << it.getValue() << endl;
-    }
-    cout << endl;
-
-    a.erase("S", "cA");
-
-    for (Grammar::iterator it = a.begin(); it != a.end(); it++) {
-        cout << it.getKey() << "\t" << it.getValue() << endl;
+    set<char> temp = a.getFirst("S");
+    for (char i : temp) {
+        cout << i << " ";
     }
     cout << endl;
 

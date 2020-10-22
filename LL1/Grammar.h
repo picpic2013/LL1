@@ -33,12 +33,22 @@ public:
 	iterator end();
 
 	size_t size() const;
-	void insert(const std::string& S, const std::string& a);
-	void erase(const std::string& S, const std::string& a);
+	void insert(const std::string& S, const std::string& a, bool autoUpdateV = true);
+	void erase(const std::string& S, const std::string& a, bool autoUpdateV = true);
+	iterator find(const std::string& S, const std::string& a);
 
 	Grammar autoSplitOr();
 	void autoSplitOrInPlace();
 
+	void updateV();
+	std::set<char> getV(bool autoUpdateFirst = true);
+	std::set<char> getVN(bool autoUpdateFirst = true);
+	std::set<char> getVT(bool autoUpdateFirst = true);
+
+	std::set<char> getFirst(std::string str);
+
 private:
 	std::set<std::pair<std::string, std::string> > data;
+	std::set<char> vn, vt, v;
+	bool hasChanged;
 };
