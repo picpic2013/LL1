@@ -169,7 +169,24 @@ void Grammar::updateV() {
 	this->hasChanged = false;
 }
 
-std::set<char> Grammar::getFirst(std::string str) {
+std::set<char> Grammar::getFirst(const std::string inputString, bool autoSplitOr) {
+	if (autoSplitOr) {
+		this->autoSplitOrInPlace();
+	}
+	else {
+		Grammar newGrammar = *this;
+		return newGrammar.getFirst(inputString, true);
+	}
+
+	if (this->firstSetCache.find(inputString) != this->firstSetCache.end()) {
+		return this->firstSetCache[inputString];
+	}
+	
+	std::string str = inputString;
+	if (str[str.size() - 1] != Grammar::EMPTY_CHAR) {
+		str += Grammar::EMPTY_CHAR;
+	}
+	
 	if (this->hasChanged) {
 		this->firstSetCache.clear();
 		updateV();
@@ -177,5 +194,69 @@ std::set<char> Grammar::getFirst(std::string str) {
 
 	std::set<char> res;
 
+	for (int index = 0; index < str.size(); ++index) {
+		char ch = str[index];
+		if (isVt(ch) || ch == Grammar::EMPTY_CHAR) {
+			res.insert(ch);
+			return res;
+		}
+		bool hasNull = false;
+		for (auto i : getAllValues(ch)) {
+			std::string newStr = i + str.substr(static_cast<long long>(index) + 1, str.size());
+			for (auto ele : getFirst(newStr)) {
+				if (ele == Grammar::EMPTY_CHAR) {
+					hasNull = true;
+				}
+				else {
+					res.insert(ele);
+				}
+			}
+		}
+		if (!hasNull) {
+			return res;
+		}
+	}
+	
+	this->firstSetCache.insert(std::make_pair(inputString, res));
+	return res;
+}
+
+std::set<char> Grammar::getFirst(Grammar& g, const std::string str, bool autoSplitOr) {
+	return g.getFirst(str, autoSplitOr);
+}
+
+bool Grammar::isVn(char ch) {
+	if (this->hasChanged) {
+		updateV();
+	}
+	return this->vn.find(ch) != this->vn.end();
+}
+
+bool Grammar::isVt(char ch) {
+	if (this->hasChanged) {
+		updateV();
+	}
+	return this->vt.find(ch) != this->vt.end();
+}
+
+std::set<std::string> Grammar::getAllValues(const std::string key) {
+	std::set<std::string> res;
+	for (auto it : this->data) {
+		if (it.first == key) {
+			res.insert(it.second);
+		}
+	}
+	return res;
+}
+
+std::set<std::string> Grammar::getAllValues(const char key_) {
+	std::string key;
+	key += key_;
+	std::set<std::string> res;
+	for (auto it : this->data) {
+		if (it.first == key) {
+			res.insert(it.second);
+		}
+	}
 	return res;
 }

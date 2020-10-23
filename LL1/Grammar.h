@@ -45,11 +45,20 @@ public:
 	std::set<char> getVN(bool autoUpdateFirst = true);
 	std::set<char> getVT(bool autoUpdateFirst = true);
 
-	std::set<char> getFirst(std::string str);
+	std::set<char> getFirst(const std::string str, bool autoSplitOr = true);
+	static std::set<char> getFirst(Grammar& g, const std::string str, bool autoSplitOr = true);
+
+	std::set<std::string> getAllValues(const std::string key);
+	std::set<std::string> getAllValues(const char key);
+
+	const static char EMPTY_CHAR = '@';
 
 protected:
 	std::set<std::pair<std::string, std::string> > data;
 	std::set<char> vn, vt, v;
 	std::map<std::string, std::set<char> > firstSetCache;
 	bool hasChanged;
+
+	bool isVn(char ch);
+	bool isVt(char ch);
 };
