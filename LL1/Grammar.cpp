@@ -86,10 +86,10 @@ size_t Grammar::size() const {
 
 void Grammar::insert(const std::string& S, const std::string& a, bool autoUpdateV) {
 	this->data.insert(std::make_pair(S, a));
+	this->hasChanged = true;
 	if (autoUpdateV) {
 		updateV();
 	}
-	this->hasChanged = true;
 }
 
 void Grammar::erase(const std::string& S, const std::string& a, bool autoUpdateV) {
@@ -97,10 +97,10 @@ void Grammar::erase(const std::string& S, const std::string& a, bool autoUpdateV
 	if (it != this->data.end()) {
 		this->data.erase(it);
 	}
+	this->hasChanged = true;
 	if (autoUpdateV) {
 		updateV();
 	}
-	this->hasChanged = true;
 }
 
 Grammar::iterator Grammar::find(const std::string& S, const std::string& a) {
@@ -170,32 +170,12 @@ void Grammar::updateV() {
 }
 
 std::set<char> Grammar::getFirst(std::string str) {
+	if (this->hasChanged) {
+		this->firstSetCache.clear();
+		updateV();
+	}
+
 	std::set<char> res;
-
-	if (str.size() == 0) {
-		return res;
-	}
-
-	if (str.size() == 1 && (str[0] == '\0' || str[0] == '@')) {
-		res.insert('@');
-		return res;
-	}
-
-	for (std::string::iterator it = str.begin(); it != str.end(); it++) {
-		if (this->vt.find(*it) != this->vt.end()) {
-			res.insert(*it);
-			return res;
-		}
-		std::set<char> tempSet = getFirst(str.substr(it - str.begin() + 1, str.size()));
-
-		for (char i : tempSet) {
-			res.insert(i);
-		}
-
-		if (tempSet.find('@') == tempSet.end()) {
-			break;
-		}
-	}
 
 	return res;
 }

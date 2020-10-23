@@ -47,8 +47,9 @@ public:
 
 	std::set<char> getFirst(std::string str);
 
-private:
+protected:
 	std::set<std::pair<std::string, std::string> > data;
 	std::set<char> vn, vt, v;
+	std::map<std::string, std::set<char> > firstSetCache;
 	bool hasChanged;
 };
