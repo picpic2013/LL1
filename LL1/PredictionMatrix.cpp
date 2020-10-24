@@ -36,3 +36,17 @@ void PredictionMatrix::add(const std::string& S, const std::string& a, const std
 	}
 	this->data[S][a] = exp;
 }
+
+std::ostream& operator<<(std::ostream& out, PredictionMatrix& p) {
+	std::map<std::string, int> len;
+	for (auto i : p.data) {
+		int& oldLen = len[i.first];
+		int nowLen = i.second.size();
+		oldLen = nowLen ? nowLen > oldLen : oldLen;
+	}
+	out << "©°";
+	for (auto col : len) {
+		// for (int i = 0; i < col.second + 2; i++)
+	}
+	return out;
+}

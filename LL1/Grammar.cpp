@@ -2,12 +2,16 @@
 #include <algorithm>
 #include <iostream>
 
-Grammar::Grammar() {
+Grammar::Grammar(char beginSign) {
 	this->hasChanged = false;
+	this->beginSign = beginSign;
 }
 
 Grammar::Grammar(const Grammar& g) {
+	this->beginSign = g.beginSign;
 	this->data = g.data;
+	this->firstSetCache = g.firstSetCache;
+	this->followSetCache = g.followSetCache;
 	
 	if (g.hasChanged) {
 		updateV();
@@ -170,59 +174,49 @@ void Grammar::updateV() {
 }
 
 std::set<char> Grammar::getFirst(const std::string inputString, bool autoSplitOr) {
-	if (autoSplitOr) {
-		this->autoSplitOrInPlace();
-	}
-	else {
-		Grammar newGrammar = *this;
-		return newGrammar.getFirst(inputString, true);
-	}
-
-	if (this->firstSetCache.find(inputString) != this->firstSetCache.end()) {
-		return this->firstSetCache[inputString];
-	}
-	
-	std::string str = inputString;
-	if (str[str.size() - 1] != Grammar::EMPTY_CHAR) {
-		str += Grammar::EMPTY_CHAR;
-	}
-	
 	if (this->hasChanged) {
 		this->firstSetCache.clear();
 		updateV();
 	}
 
-	std::set<char> res;
-
-	for (int index = 0; index < str.size(); ++index) {
-		char ch = str[index];
-		if (isVt(ch) || ch == Grammar::EMPTY_CHAR) {
-			res.insert(ch);
-			return res;
-		}
-		bool hasNull = false;
-		for (auto i : getAllValues(ch)) {
-			std::string newStr = i + str.substr(static_cast<long long>(index) + 1, str.size());
-			for (auto ele : getFirst(newStr)) {
-				if (ele == Grammar::EMPTY_CHAR) {
-					hasNull = true;
-				}
-				else {
-					res.insert(ele);
-				}
-			}
-		}
-		if (!hasNull) {
-			return res;
-		}
+	Grammar newGrammar = *this;
+	if (autoSplitOr) {
+		newGrammar.autoSplitOrInPlace();
 	}
-	
-	this->firstSetCache.insert(std::make_pair(inputString, res));
-	return res;
+
+	return newGrammar.getFirstWithoutAutoSplit(inputString);
 }
 
-std::set<char> Grammar::getFirst(Grammar& g, const std::string str, bool autoSplitOr) {
-	return g.getFirst(str, autoSplitOr);
+std::set<char> Grammar::getFirst(Grammar& g, const std::string inputString, bool autoSplitOr) {
+	return g.getFirst(inputString, autoSplitOr);
+}
+
+std::set<char> Grammar::getFollow(const char inputString, bool autoSplitOr) {
+	std::map<char, int> stringInStack;
+	
+	Grammar newGrammar = *this;
+	if (autoSplitOr) {
+		newGrammar.autoSplitOrInPlace();
+	}
+	return this->getFollowWithoutAutoSplit(inputString, stringInStack);
+}
+
+std::set<char> Grammar::getFollow(Grammar& g, const std::string inputString, bool autoSplitOr) {
+	return g.getFirst(inputString, autoSplitOr);
+}
+
+std::set<char> Grammar::getSelect(const std::string S, const std::string a, bool autoSplitOr) {
+	if (this->hasChanged) {
+		this->firstSetCache.clear();
+		updateV();
+	}
+
+	Grammar newGrammar = *this;
+	if (autoSplitOr) {
+		newGrammar.autoSplitOrInPlace();
+	}
+	
+	return newGrammar.getSelectWithoutautoSplit(S, a);
 }
 
 bool Grammar::isVn(char ch) {
@@ -259,4 +253,185 @@ std::set<std::string> Grammar::getAllValues(const char key_) {
 		}
 	}
 	return res;
+}
+
+bool Grammar::isLL1(bool autoSplitOr) {
+	if (autoSplitOr) {
+		Grammar newGrammar = *this;
+		return newGrammar.isLL1(false);
+	}
+	std::map<std::string, std::set<char> > m;
+	for (auto i : this->data) {
+		if (m.find(i.first) == m.end()) {
+			std::set<char> tmp;
+			for (char ele : getSelect(i.first, i.second, true)) {
+				tmp.insert(ele);
+			}
+			m[i.first] = tmp;
+		}
+		else {
+			std::set<char>& tmp = m[i.first];
+			for (char ele : getSelect(i.first, i.second, true)) {
+				if (tmp.find(ele) != tmp.end()) {
+					return false;
+				}
+				tmp.insert(ele);
+			}
+		}
+	}
+	return true;
+}
+
+PredictionMatrix Grammar::getPredictionMatrix() {
+	PredictionMatrix m;
+	if (!isLL1()) {
+		return m;
+	}
+	for (auto i : this->data) {
+		for (auto ele : getSelect(i.first, i.second)) {
+			std::string tmp = "" + ele;
+			m.add(i.first, tmp, i.second);
+		}
+	}
+}
+
+std::set<char> Grammar::getFirstWithoutAutoSplit(const std::string inputString) {
+	if (this->firstSetCache.find(inputString) != this->firstSetCache.end()) {
+		return this->firstSetCache[inputString];
+	}
+
+	std::string str = inputString;
+	if (str[str.size() - 1] != Grammar::EMPTY_CHAR) {
+		str += Grammar::EMPTY_CHAR;
+	}
+
+	std::set<char> res;
+
+	for (int index = 0; index < str.size(); ++index) {
+		char ch = str[index];
+		if (isVt(ch) || ch == Grammar::EMPTY_CHAR) {
+			res.insert(ch);
+			return res;
+		}
+		bool hasNull = false;
+		for (auto i : getAllValues(ch)) {
+			std::string newStr = i + str.substr(static_cast<long long>(index) + 1, str.size());
+			for (auto ele : getFirstWithoutAutoSplit(newStr)) {
+				if (ele == Grammar::EMPTY_CHAR) {
+					hasNull = true;
+				}
+				else {
+					res.insert(ele);
+				}
+			}
+		}
+		if (!hasNull) {
+			return res;
+		}
+	}
+
+	this->firstSetCache.insert(std::make_pair(inputString, res));
+	return res;
+}
+
+std::set<char> Grammar::getFollowWithoutAutoSplit(const char inputString, std::map<char, int>& stringInStack) {
+	if (this->followSetCache.find(inputString) != this->followSetCache.end()) {
+		return this->followSetCache[inputString];
+	}
+
+	std::set<char> res;
+
+	if (inputString == this->beginSign) {
+		res.insert('#');
+	}
+
+	if (stringInStack.find(inputString) != stringInStack.end()) {
+		return res;
+	}
+
+	bool isInStack = stringInStack[inputString]++ != 0;
+
+	for (auto i : this->data) {
+		std::string afterString = i.second;
+		while (afterString.find(inputString) != std::string::npos) {
+			afterString = afterString.substr(afterString.find(inputString) + 1, afterString.size());
+			if (afterString.size() == 0) {
+				for (char ii : getFollowWithoutAutoSplit(i.first[0], stringInStack)) {
+					res.insert(ii);
+				}
+				break;
+			}
+			if (isVt(afterString[0])) {
+				res.insert(afterString[0]);
+			}
+			else {
+				bool hasEmpty = false;
+				for (char ii : getFirstWithoutAutoSplit(afterString)) {
+					if (ii == Grammar::EMPTY_CHAR) {
+						hasEmpty = true;
+					}
+					else {
+						res.insert(ii);
+					}
+				}
+				if (hasEmpty && !isInStack) {
+					for (char ii : getFollowWithoutAutoSplit(i.first[0], stringInStack)) {
+						res.insert(ii);
+					}
+				}
+			}
+		}
+	}
+
+	--stringInStack[inputString];
+
+	this->followSetCache.insert(std::make_pair(inputString, res));
+	return res;
+}
+
+std::set<char> Grammar::getFollowWithoutSplit(const char inputString) {
+	std::map<char, int> stringInStack;
+	return this->getFollowWithoutAutoSplit(inputString, stringInStack);
+}
+
+std::set<char> Grammar::getSelectWithoutautoSplit(const std::string& S, const std::string& a) {
+	std::set<char> res;
+	auto it = this->data.find(std::make_pair(S, a));
+	if (S.size() != 1) {
+		return res;
+	}
+	bool hasEmpty = false;
+	for (char i : getFirstWithoutAutoSplit(a)) {
+		if (i != Grammar::EMPTY_CHAR) {
+			res.insert(i);
+		}
+		else {
+			hasEmpty = true;
+		}
+	}
+	if (hasEmpty) {
+		for (char i : getFollowWithoutSplit(S[0])) {
+			res.insert(i);
+		}
+	}
+	return res;
+}
+
+std::istream& operator>>(std::istream& in, Grammar& g) {
+	std::string input;
+	while (in >> input) {
+		size_t idx = input.find("->");
+		if (idx != std::string::npos && idx == 1 && input.size() > 4 && idx < input.size() - 3) {
+			g.insert(input.substr(0, idx), input.substr(idx), false);
+		}
+	}
+	g.updateV();
+	return in;
+}
+
+std::ostream& operator<<(std::ostream& out, Grammar& g) {
+	for (auto it = g.begin(); it != g.end(); it++) {
+		out << it.getKey() << " " << it.getValue() << std::endl;
+	}
+	return out;
 }

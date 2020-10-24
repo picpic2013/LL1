@@ -3,7 +3,8 @@
 using namespace std;
 
 int main() {
-    Grammar a;
+
+    Grammar a('S');
     /*
     a.insert("S", "aBa|cc", false);
     a.insert("S", "cA|aaa|bbb|ccc|@", false);
@@ -12,22 +13,44 @@ int main() {
     a.insert("C", "bb", false);
     a.insert("D", "bb", false);
     */
+
+    /* 
+E->TA
+A->+TA|@
+B->*FB|@
+F->i|(E)
+T->FB
+    */
+
+    /*
+    a.insert("E", "TA");
+    a.insert("A", "+TA|@");
+    a.insert("T", "FB");
+    a.insert("B", "*FB|@");
+    a.insert("F", "i|(E)");
+    a.autoSplitOrInPlace();
+    */
     
-    a.insert("S", "AB|BA");
-    a.insert("A", "aA|c");
-    a.insert("B", "bB|@");
+    // cin >> a;
 
+    a.insert("S", "MH|a");
+    a.insert("H", "LSo|@");
+    a.insert("K", "dML|@");
+    a.insert("L", "eHf");
+    a.insert("M", "K|bLM");
 
-    for (auto it = a.begin(); it != a.end(); it++) {
-        cout << it.getKey() << " " << it.getValue() << endl;
+    a.autoSplitOrInPlace();
+
+    cout << a << endl;
+
+    cout << a.isLL1() << endl;
+
+    for (auto it = a.begin(); it != a.end(); ++it) {
+        for (char i : a.getSelect(it.getKey(), it.getValue())) {
+            cout << i << " ";
+        }
+        cout << endl;
     }
-    cout << endl;
-
-    set<char> temp = a.getFirst("S");
-    for (char i : temp) {
-        cout << i << " ";
-    }
-    cout << endl;
-
+    
     return 0;
 }

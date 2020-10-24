@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <iostream>
 #include "Status.h"
 
 /**
@@ -45,6 +46,8 @@ public:
 	*  @Param exp: grammar derivation ( "aBc" for the example. )
 	*/
 	void add(const std::string& S, const std::string& a, const std::string& exp);
+
+	friend std::ostream& operator<<(std::ostream& out, PredictionMatrix& p);
 
 private:
 	// inner data structure
