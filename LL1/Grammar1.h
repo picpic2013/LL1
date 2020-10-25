@@ -6,12 +6,14 @@
 #include <string>
 #include <iostream>
 #include "PredictionMatrix.h"
-
-class Grammar {
+#include "Grammar2.h"
+//刘黎明 and 王冬霞 ：求解First、Follow、Select集合
+class Grammar1 {
 public:
-	Grammar(char beginSign);
-	Grammar(const Grammar& g);
-	~Grammar();
+	Grammar1(char beginSign);
+	Grammar1(const Grammar1& g);
+	Grammar1(const Grammar2& g);
+	~Grammar1();
 
 	class iterator {
 	public:
@@ -39,30 +41,39 @@ public:
 	void erase(const std::string& S, const std::string& a, bool autoUpdateV = true);
 	iterator find(const std::string& S, const std::string& a);
 
-	Grammar autoSplitOr();
+	Grammar1 autoSplitOr();
 	void autoSplitOrInPlace();
 
 	void updateV();
 	std::set<char> getV(bool autoUpdateFirst = true);
 	std::set<char> getVN(bool autoUpdateFirst = true);
 	std::set<char> getVT(bool autoUpdateFirst = true);
+	std::set<std::pair<std::string, std::string> >getData();
+	char getBeginSign()const;
 
 	std::set<char> getFirst(const std::string inputString, bool autoSplitOr = true);
-	static std::set<char> getFirst(Grammar& g, const std::string inputString, bool autoSplitOr = true);
+	static std::set<char> getFirst(Grammar1& g, const std::string inputString, bool autoSplitOr = true);
 	std::set<char> getFollow(const char inputString, bool autoSplitOr = true);
-	static std::set<char> getFollow(Grammar& g, const std::string inputString, bool autoSplitOr = true);
+	static std::set<char> getFollow(Grammar1& g, const std::string inputString, bool autoSplitOr = true);
 	std::set<char> getSelect(const std::string S, const std::string a, bool autoSplitOr = true);
 
 	std::set<std::string> getAllValues(const std::string key);
 	std::set<std::string> getAllValues(const char key);
 
+	bool isLeftRecursiveGrammar1();
+	static bool isLeftRecursiveGrammar1(Grammar1 Grammar1);
 	bool isLL1(bool autoSplitOr = true);
 	PredictionMatrix getPredictionMatrix();
 
 	const static char EMPTY_CHAR = '@';
 
-	friend std::istream& operator>>(std::istream& in, Grammar& g);
-	friend std::ostream& operator<<(std::ostream& out, Grammar& g);
+	friend std::istream& operator>>(std::istream& in, Grammar1& g);
+	friend std::ostream& operator<<(std::ostream& out, Grammar1& g);
+	friend class PredictionMatrix;
+
+	Grammar2 getGrammar2();
+	bool fitGrammar(std::string inputString);
+
 
 protected:
 	std::set<std::pair<std::string, std::string> > data;

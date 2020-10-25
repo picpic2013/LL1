@@ -2,8 +2,9 @@
 
 #include <string>
 #include <map>
+#include <iostream>
+#include<stack>
 #include "Status.h"
-
 /**
 *  Data structure for the prediction matrix
 *  @Author: Liming Liu
@@ -45,6 +46,9 @@ public:
 	*  @Param exp: grammar derivation ( "aBc" for the example. )
 	*/
 	void add(const std::string& S, const std::string& a, const std::string& exp);
+
+	friend std::ostream& operator<<(std::ostream& out, PredictionMatrix& p);
+
 
 private:
 	// inner data structure
